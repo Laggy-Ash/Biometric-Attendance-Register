@@ -1,13 +1,16 @@
 #include <Adafruit_Fingerprint.h>
+using namespace std ;
 #if (defined(__AVR__) || defined(ESP8266)) && !defined(__AVR_ATmega2560__)
 SoftwareSerial mySerial(2, 3);
 #else
 #define mySerial Serial1
 #endif
-
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
 uint8_t operation;
 uint8_t id;
+// Print present roll no
+int present[66]; // Stores roll no of students present
+int i = -1;
 
 void detectFingerprintScanner(){
   if (finger.verifyPassword()) {
@@ -160,7 +163,7 @@ p = finger.createModel();
     return p;
   } else if (p == FINGERPRINT_ENROLLMISMATCH) {
     Serial.println("Fingerprints did not match");
-    // return p;
+    return p;
   } else {
     Serial.println("Unknown error");
     return p;
@@ -190,11 +193,11 @@ return true;
 }
 
 void enrollFingerprint(){
-Serial.println("Ready to enroll a fingerprint!");
+Serial.println("\nReady to enroll a fingerprint!");
 Serial.println("Please type in the ID # (from 1 to 127) you want to save this finger as...");
 id = readUserInput();
 if (id == 0) {return;}
-Serial.print("Enrolling ID #");
+Serial.print("\nEnrolling ID #");
 Serial.println(id);
 while (! getFingerprintEnroll());
 }
@@ -232,7 +235,7 @@ while (1) {
     }
   }
 finger.emptyDatabase();
-Serial.println("Now the database is empty.)");
+Serial.println("Now the database is empty.");
 Serial.println("---------------------------------");
 
 }
@@ -243,11 +246,13 @@ Serial.println("Press 1 to enroll a fingerprint");
 Serial.println("Press 2 to delete a fingerprint");
 Serial.println("Press 3 to empty fingerprint database");
 Serial.println("Press 4 to match fingerprint");
+Serial.println("Press 5 to print the roll no of students present");
 operation = readUserInput();
 if (operation == 1){enrollFingerprint();}
 else if (operation == 2){deleteFingerprint();}
 else if (operation == 3){deleteDatabase();}
 else if (operation == 4){matchFingerprintID();}
+else if (operation == 5){printPresent();}
 else return;
 }
 
@@ -256,7 +261,7 @@ else return;
 
 uint8_t matchFingerprintID() {
 int p = -1;
-Serial.print("Waiting for valid finger"); 
+Serial.println("\nWaiting for valid finger"); 
 while (p != FINGERPRINT_OK) {
     p = finger.getImage();
     switch (p) {
@@ -281,7 +286,7 @@ while (p != FINGERPRINT_OK) {
 p = finger.image2Tz(1);
 switch (p) {
     case FINGERPRINT_OK:
-      Serial.println("Image converted");
+      Serial.println("\nImage converted");
       break;
     case FINGERPRINT_IMAGEMESS:
       Serial.println("Image too messy");
@@ -302,7 +307,7 @@ switch (p) {
 
   p = finger.fingerSearch();
   if (p == FINGERPRINT_OK) {
-    Serial.println("Found a print match!");
+    Serial.println("\nFound a print match!");
   } else if (p == FINGERPRINT_PACKETRECIEVEERR) {
     Serial.println("Communication error");
     return p;
@@ -316,6 +321,19 @@ switch (p) {
 
   Serial.print("Found ID #"); Serial.print(finger.fingerID);
   Serial.print(" with confidence of "); Serial.println(finger.confidence);
-
+  int printID = finger.fingerID ;
+  i++ ;
+  present[i] = printID ;
   return finger.fingerID;
+}
+
+void printPresent(){
+  Serial.println("Students presents:") ;
+  int i ;
+  for (i = 0; i != 65, present[i] != 0; i++)
+  {
+    Serial.print(present[i]);
+    Serial.print(", ");
+  }
+  Serial.println(' ');
 }
