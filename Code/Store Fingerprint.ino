@@ -22,8 +22,8 @@ void detectFingerprintScanner(){
   Serial.println("---------------------------------");
 }
 
-/*void verifyScannerParameters(){
-  Serial.println(F("Reading sensor parameters"));
+void verifyScannerParameters(){
+  Serial.println(F("\nReading sensor parameters"));
   finger.getParameters();
   Serial.print(F("Status: 0x")); Serial.println(finger.status_reg, HEX);
   Serial.print(F("Sys ID: 0x")); Serial.println(finger.system_id, HEX);
@@ -32,9 +32,8 @@ void detectFingerprintScanner(){
   Serial.print(F("Device address: ")); Serial.println(finger.device_addr, HEX);
   Serial.print(F("Packet len: ")); Serial.println(finger.packet_len);
   Serial.print(F("Baud rate: ")); Serial.println(finger.baud_rate);
-  Serial.println("");
-  Serial.println("");
-} */
+  Serial.println("---------------------------------");
+} 
 
 void setup() {
   Serial.begin(9600);
@@ -106,7 +105,7 @@ delay(2000);
 p = 0;
 while (p != FINGERPRINT_NOFINGER) {p = finger.getImage();}
 Serial.println("");
-Serial.print("ID "); Serial.println(id);
+Serial.print("Finger ID "); Serial.println(id); Serial.print("\n") ;
 p = -1;
 
 //Scan for Second Time
@@ -173,6 +172,7 @@ p = finger.createModel();
 Serial.print("ID "); Serial.println(id);
 p = finger.storeModel(id);
 if (p == FINGERPRINT_OK) {
+  Serial.println("---------------------------------") ;
 Serial.println("Congratulations! Fingerprint is successfully enrolled.");
   } else if (p == FINGERPRINT_PACKETRECIEVEERR) {
     Serial.println("Communication error");
@@ -253,6 +253,7 @@ else if (operation == 2){deleteFingerprint();}
 else if (operation == 3){deleteDatabase();}
 else if (operation == 4){matchFingerprintID();}
 else if (operation == 5){printPresent();}
+else if (operation == 10){verifyScannerParameters();}
 else return;
 }
 
@@ -328,12 +329,12 @@ switch (p) {
 }
 
 void printPresent(){
-  Serial.println("Students presents:") ;
+  Serial.println("\nStudents presents:") ;
   int i ;
   for (i = 0; i != 65, present[i] != 0; i++)
   {
     Serial.print(present[i]);
     Serial.print(", ");
   }
-  Serial.println(' ');
+  Serial.print('\n');
 }
